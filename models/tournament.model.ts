@@ -59,7 +59,9 @@ const tournamentSchema = new Schema(
       type: Date,
       required: true,
       validate: {
-        validator: (val: Date) => val > new Date(),
+        validator: function(this: ITournament, val: Date) {
+          return this.isNew ? val > new Date() : true;
+        },
         message: () => 'Invalid startDate.',
       },
     },

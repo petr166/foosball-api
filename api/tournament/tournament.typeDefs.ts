@@ -6,7 +6,9 @@ export default gql`
   }
 
   extend type Mutation {
-    addTournament(input: TournamentInput!): Tournament @isAuthenticated
+    createTournament(input: TournamentInput!): Tournament @isAuthenticated
+    editTournament(id: ID, input: EditTournamentInput!): Tournament
+      @isAuthenticated
   }
 
   type Tournament implements Doc {
@@ -37,6 +39,18 @@ export default gql`
     maxPlayers: Int
     minGames: Int
     inviteList: [ID]
+  }
+
+  input EditTournamentInput {
+    name: String
+    cover: String
+    description: String
+    startDate: String
+    endDate: String
+    privacy: String
+    teamSize: Int
+    maxPlayers: Int
+    minGames: Int
   }
 
   type Standing implements Doc {
