@@ -54,6 +54,7 @@ export default gql`
   }
 
   type Standing implements Doc {
+    id: String!
     user: User!
     played: Int!
     won: Int!

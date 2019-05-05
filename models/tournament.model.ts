@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 import { IUser } from './user.model';
 
 export interface IStanding extends Document {
+  id: string;
   user: string | IUser;
   played: number;
   won: number;
@@ -109,6 +110,16 @@ const tournamentSchema = new Schema(
 );
 
 tournamentSchema.set('toObject', { getters: true, virtuals: true });
+
+tournamentSchema.pre('save', function() {
+  if (this.isNew) {
+    this.set('standings', [
+      {
+        user: this.get('creatorUser'),
+      },
+    ]);
+  }
+});
 
 const Tournament = model<ITournament>('Tournament', tournamentSchema);
 
