@@ -6,6 +6,10 @@ import directiveResolvers from './directiveResolvers';
 import { userTypeDefs, userResolvers } from './user';
 import { authTypeDefs, authResolvers } from './auth';
 import { tournamentTypeDefs, tournamentResolvers } from './tournament';
+import {
+  tournamentInvitationTypeDefs,
+  tournamentInvitationResolvers,
+} from './tournamentInvitation';
 
 const rootTypeDefs = gql`
   directive @isAuthenticated on FIELD | FIELD_DEFINITION
@@ -29,12 +33,19 @@ const rootTypeDefs = gql`
 `;
 
 export default makeExecutableSchema({
-  typeDefs: [rootTypeDefs, userTypeDefs, authTypeDefs, tournamentTypeDefs],
+  typeDefs: [
+    rootTypeDefs,
+    userTypeDefs,
+    authTypeDefs,
+    tournamentTypeDefs,
+    tournamentInvitationTypeDefs,
+  ],
   resolvers: merge([
     { Doc: { __resolveType: () => null } },
     userResolvers,
     authResolvers,
     tournamentResolvers,
+    tournamentInvitationResolvers,
   ]),
   directiveResolvers,
 });
