@@ -23,14 +23,16 @@ export interface ITournament extends Document {
   maxPlayers: 5 | 10 | 20 | 50;
   minGames: number;
   creatorUser: string | IUser;
-  standings: [IStanding];
+  standings: IStanding[];
   joinTournament(
     userId: string | Schema.Types.ObjectId
   ): Promise<ITournament | null>;
   canJoin(userId: string | Schema.Types.ObjectId): Promise<boolean>;
+  hasParticipants(userIds: any[]): boolean;
+  editStandings(newStandings: IStanding[]): Promise<ITournament | null>;
 }
 
-const standingSchema = new Schema(
+export const standingSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -159,6 +161,37 @@ tournamentSchema.methods.canJoin = async function(
       user: userId,
     }))
   );
+};
+
+tournamentSchema.methods.hasParticipants = function(
+  this: ITournament,
+  userIds: any[]
+): boolean {
+  return !userIds.some(userIdRaw => {
+    const userId = String(userIdRaw);
+    return !this.standings.find(v => String(v.user) !== userId);
+  });
+};
+
+tournamentSchema.methods.editStandings = async function(
+  this: ITournament,
+  newStandings: IStanding[]
+): Promise<ITournament | null> {
+  const standings: IStanding[] = this.get('standings');
+
+  newStandings.forEach(newStanding => {
+    const index = standings.findIndex(
+      v => String(v.user) === String(newStanding.user)
+    );
+
+    if (index > -1) {
+      Object.keys(newStanding).forEach(key => {
+        standings[index].set(key, newStanding.get(key));
+      });
+    }
+  });
+
+  return this.save();
 };
 
 const Tournament = model<ITournament>('Tournament', tournamentSchema);

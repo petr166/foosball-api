@@ -18,6 +18,11 @@ const PROD = NODE_ENV === 'production';
 const DB_CONN_STR = `mongodb://${DB_URI}:${DB_PORT}`;
 const SYNC_DB_INDEXES = String(rawSYNC_DB_INDEXES) === 'true';
 
+// score calculator
+const SCORE_DIFF_FACTOR = 1 / 10;
+const POINTS_DIFF_FACTOR = 1 / 10;
+const GAME_COUNT_FACTOR = 1 / 10;
+
 export {
   NODE_ENV,
   API_ROOT,
@@ -31,4 +36,7 @@ export {
   DB_CONN_STR,
   TOKEN_HEADER,
   SYNC_DB_INDEXES,
+  SCORE_DIFF_FACTOR,
+  POINTS_DIFF_FACTOR,
+  GAME_COUNT_FACTOR,
 };
