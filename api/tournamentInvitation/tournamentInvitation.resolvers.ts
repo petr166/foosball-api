@@ -1,5 +1,6 @@
-import { Tournament, TournamentInvitation } from '../../models';
+import { TournamentInvitation } from '../../models';
 import { extractReqFields } from '../../utils';
+import { tournamentFromParent } from '../tournament/tournament.resolvers';
 
 export const tournamentInvitations = async (
   p: any,
@@ -13,24 +14,11 @@ export const tournamentInvitations = async (
   return tournamentInvitations.map(v => v.toObject());
 };
 
-export const tournamentInvitationTournament = async (
-  p: any,
-  args: any,
-  ctx: any,
-  info: any
-) => {
-  const tournament = await Tournament.findById(p.tournament).select(
-    extractReqFields(info)
-  );
-
-  return tournament ? tournament.toObject() : null;
-};
-
 export default {
   Query: {
     tournamentInvitations,
   },
   TournamentInvitation: {
-    tournament: tournamentInvitationTournament,
+    tournament: tournamentFromParent('tournament'),
   },
 };

@@ -1,6 +1,8 @@
-import { Tournament, User } from '../../models';
-import { extractReqFields } from '../../utils';
 import { ApolloError, AuthenticationError } from 'apollo-server';
+
+import { Tournament } from '../../models';
+import { extractReqFields } from '../../utils';
+import { userFromParent } from '../user/user.resolvers';
 
 export const tournament = async (p: any, { id }: any, ctx: any, info: any) => {
   const tournament = await Tournament.findById(id).select(
@@ -9,26 +11,17 @@ export const tournament = async (p: any, { id }: any, ctx: any, info: any) => {
   return tournament ? tournament.toObject() : null;
 };
 
-export const tournamentCreatorUser = async (
+export const tournamentFromParent = (tournamentKey: string) => async (
   p: any,
   args: any,
   ctx: any,
   info: any
 ) => {
-  const user = await User.findById(p.creatorUser).select(
+  const tournament = await Tournament.findById(p[tournamentKey]).select(
     extractReqFields(info)
   );
-  return user ? user.toObject() : null;
-};
 
-export const tournamentStandingsUser = async (
-  p: any,
-  args: any,
-  ctx: any,
-  info: any
-) => {
-  const user = await User.findById(p.user).select(extractReqFields(info));
-  return user ? user.toObject() : null;
+  return tournament ? tournament.toObject() : null;
 };
 
 export const createTournament = async (
@@ -87,9 +80,9 @@ export default {
     joinTournament,
   },
   Tournament: {
-    creatorUser: tournamentCreatorUser,
+    creatorUser: userFromParent('creatorUser'),
   },
   Standing: {
-    user: tournamentStandingsUser,
+    user: userFromParent('user'),
   },
 };

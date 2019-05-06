@@ -13,6 +13,16 @@ export const user = async (p: any, { id }: any, ctx: any, info: any) => {
   return found ? found.toObject() : null;
 };
 
+export const userFromParent = (userKey: string) => async (
+  p: any,
+  args: any,
+  ctx: any,
+  info: any
+) => {
+  const found = await User.findById(p[userKey]).select(extractReqFields(info));
+  return found ? found.toObject() : null;
+};
+
 export const register = async (p: any, { input }: any) => {
   const { password, repeatPassword } = input;
   if (password !== repeatPassword) {
