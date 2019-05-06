@@ -7,8 +7,9 @@ export default gql`
 
   extend type Mutation {
     createTournament(input: TournamentInput!): Tournament @isAuthenticated
-    editTournament(id: ID, input: EditTournamentInput!): Tournament
+    editTournament(id: ID!, input: EditTournamentInput!): Tournament
       @isAuthenticated
+    joinTournament(id: ID!): Tournament @isAuthenticated
   }
 
   type Tournament implements Doc {

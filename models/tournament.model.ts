@@ -1,5 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
+
 import { IUser } from './user.model';
+import TournamentInvitation from './tournamentInvitation.model';
 
 export interface IStanding extends Document {
   id: string;
@@ -22,6 +24,8 @@ export interface ITournament extends Document {
   minGames: number;
   creatorUser: string | IUser;
   standings: [IStanding];
+  joinTournament(userId: string | Schema.Types.ObjectId): Promise<any>;
+  canJoin(userId: string | Schema.Types.ObjectId): Promise<boolean>;
 }
 
 const standingSchema = new Schema(
@@ -30,6 +34,7 @@ const standingSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      unique: true,
     },
     played: { type: Number, default: 0, min: 0 },
     won: {
@@ -120,6 +125,32 @@ tournamentSchema.pre('save', function() {
     ]);
   }
 });
+
+tournamentSchema.methods.joinTournament = async function(
+  userId: string | Schema.Types.ObjectId
+): Promise<any> {
+  if (!(await this.canJoin(userId)))
+    throw new Error('This user cannot join the tournament.');
+
+  const standings: [IStanding] = this.get('standings');
+  if (standings.find(v => String(v.user) === String(userId)))
+    throw new Error('User already participating.');
+
+  this.set('standings', [...standings, { user: userId }]);
+  return this.save();
+};
+
+tournamentSchema.methods.canJoin = async function(
+  userId: string | Schema.Types.ObjectId
+): Promise<boolean> {
+  return (
+    this.get('privacy') === 'public' ||
+    !!(await TournamentInvitation.findOne({
+      tournament: this.get('id'),
+      user: userId,
+    }))
+  );
+};
 
 const Tournament = model<ITournament>('Tournament', tournamentSchema);
 
