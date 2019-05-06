@@ -19,9 +19,10 @@ const DB_CONN_STR = `mongodb://${DB_URI}:${DB_PORT}`;
 const SYNC_DB_INDEXES = String(rawSYNC_DB_INDEXES) === 'true';
 
 // score calculator
-const SCORE_DIFF_FACTOR = 1 / 10;
-const POINTS_DIFF_FACTOR = 1 / 10;
-const GAME_COUNT_FACTOR = 1 / 10;
+const BASE_POINTS = 3;
+const SCORE_DIFF_FACTOR = 0.1;
+const POINTS_DIFF_FACTOR = 0.2;
+const FRADRAG_PERCENTAGE = 0.3;
 
 export {
   NODE_ENV,
@@ -36,7 +37,8 @@ export {
   DB_CONN_STR,
   TOKEN_HEADER,
   SYNC_DB_INDEXES,
+  BASE_POINTS,
   SCORE_DIFF_FACTOR,
   POINTS_DIFF_FACTOR,
-  GAME_COUNT_FACTOR,
+  FRADRAG_PERCENTAGE,
 };

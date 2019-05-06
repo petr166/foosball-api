@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 
 import { IUser } from './user.model';
 import TournamentInvitation from './tournamentInvitation.model';
+import { FRADRAG_PERCENTAGE } from '../config';
 
 export interface IStanding extends Document {
   id: string;
@@ -9,6 +10,7 @@ export interface IStanding extends Document {
   played: number;
   won: number;
   points: number;
+  rawPoints: number;
 }
 
 export interface ITournament extends Document {
@@ -53,12 +55,19 @@ export const standingSchema = new Schema(
       },
     },
     // is Float in gql
-    points: { type: Number, default: 0, min: 0 },
+    rawPoints: { type: Number, default: 0, min: 0, select: true },
   },
   { timestamps: true }
 );
 
 standingSchema.set('toObject', { getters: true, virtuals: true });
+
+standingSchema.virtual('points').get(function(this: IStanding) {
+  const fullPoints =
+    this.rawPoints * FRADRAG_PERCENTAGE +
+    this.rawPoints * (1 - FRADRAG_PERCENTAGE) * (this.won / this.played);
+  return +fullPoints.toFixed(1);
+});
 
 const tournamentSchema = new Schema(
   {
@@ -169,7 +178,7 @@ tournamentSchema.methods.hasParticipants = function(
 ): boolean {
   return !userIds.some(userIdRaw => {
     const userId = String(userIdRaw);
-    return !this.standings.find(v => String(v.user) !== userId);
+    return !this.standings.find(v => String(v.user) === userId);
   });
 };
 

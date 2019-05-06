@@ -3,11 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 import { IUser } from './user.model';
 import Tournament, { ITournament, IStanding } from './tournament.model';
 
-import {
-  SCORE_DIFF_FACTOR,
-  POINTS_DIFF_FACTOR,
-  GAME_COUNT_FACTOR,
-} from '../config';
+import { SCORE_DIFF_FACTOR, POINTS_DIFF_FACTOR, BASE_POINTS } from '../config';
 
 export interface IGame extends Document {
   id: string;
@@ -105,16 +101,18 @@ gameSchema.pre('save', async function(this: IGame) {
     const pointSumReducer = (sum: number = 0, currentObj: IStanding) =>
       sum + currentObj.points;
 
-    const pointDiff = Math.abs(
-      winners.reduce(pointSumReducer, 0) / winners.length -
-        losers.reduce(pointSumReducer, 0) / losers.length
-    );
+    const pointDiff =
+      losers.reduce(pointSumReducer, 0) / losers.length -
+      winners.reduce(pointSumReducer, 0) / winners.length;
     const scoreDiff = Math.abs(this.score1 - this.score2);
+    const pointsToAddRaw =
+      BASE_POINTS +
+      scoreDiff * SCORE_DIFF_FACTOR +
+      (pointDiff > 0 ? pointDiff : 0) * POINTS_DIFF_FACTOR;
+    const pointsToAdd = +pointsToAddRaw.toFixed(1);
 
     winners = winners.map((winnerStanding: IStanding) => {
-      winnerStanding.points +=
-        (10 + scoreDiff * SCORE_DIFF_FACTOR + pointDiff * POINTS_DIFF_FACTOR) /
-        (winnerStanding.played * GAME_COUNT_FACTOR);
+      winnerStanding.rawPoints += pointsToAdd;
       winnerStanding.played += 1;
       winnerStanding.won += 1;
 
