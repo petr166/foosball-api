@@ -24,7 +24,9 @@ export interface ITournament extends Document {
   minGames: number;
   creatorUser: string | IUser;
   standings: [IStanding];
-  joinTournament(userId: string | Schema.Types.ObjectId): Promise<any>;
+  joinTournament(
+    userId: string | Schema.Types.ObjectId
+  ): Promise<ITournament | null>;
   canJoin(userId: string | Schema.Types.ObjectId): Promise<boolean>;
 }
 
@@ -128,7 +130,7 @@ tournamentSchema.pre('save', function() {
 
 tournamentSchema.methods.joinTournament = async function(
   userId: string | Schema.Types.ObjectId
-): Promise<any> {
+): Promise<ITournament | null> {
   if (!(await this.canJoin(userId)))
     throw new Error('This user cannot join the tournament.');
 
@@ -137,7 +139,14 @@ tournamentSchema.methods.joinTournament = async function(
     throw new Error('User already participating.');
 
   this.set('standings', [...standings, { user: userId }]);
-  return this.save();
+  const updated = await this.save();
+
+  TournamentInvitation.findOneAndDelete({
+    user: userId,
+    tournament: this.get('id'),
+  }).exec();
+
+  return updated;
 };
 
 tournamentSchema.methods.canJoin = async function(
