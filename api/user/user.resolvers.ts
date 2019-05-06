@@ -4,17 +4,16 @@ import { User } from '../../models';
 import { signToken, extractReqFields } from '../../utils';
 
 export const users = async (p: any, args: any, ctx: any, info: any) => {
-  const userList = await User.find(args, extractReqFields(info));
+  const userList = await User.find(args).select(extractReqFields(info));
   return userList ? userList.map(user => user.toObject()) : [];
 };
 
 export const user = async (p: any, { id }: any, ctx: any, info: any) => {
-  const found = await User.findById(id, extractReqFields(info));
+  const found = await User.findById(id).select(extractReqFields(info));
   return found ? found.toObject() : null;
 };
 
 export const register = async (p: any, { input }: any) => {
-  await User.deleteMany({}); // TODO: remove
   const { password, repeatPassword } = input;
   if (password !== repeatPassword) {
     throw new UserInputError('Passwords do not match.');

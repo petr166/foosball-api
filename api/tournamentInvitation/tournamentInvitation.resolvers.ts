@@ -7,10 +7,9 @@ export const tournamentInvitations = async (
   { currentUser }: any,
   info: any
 ) => {
-  const tournamentInvitations = await TournamentInvitation.find(
-    { user: currentUser.id },
-    extractReqFields(info)
-  );
+  const tournamentInvitations = await TournamentInvitation.find({
+    user: currentUser.id,
+  }).select(extractReqFields(info));
   return tournamentInvitations.map(v => v.toObject());
 };
 
@@ -20,8 +19,7 @@ export const tournamentInvitationTournament = async (
   ctx: any,
   info: any
 ) => {
-  const tournament = await Tournament.findById(
-    p.tournament,
+  const tournament = await Tournament.findById(p.tournament).select(
     extractReqFields(info)
   );
 
