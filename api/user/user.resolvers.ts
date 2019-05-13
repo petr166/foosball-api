@@ -1,16 +1,21 @@
 import { ApolloError, UserInputError } from 'apollo-server';
+import { fieldsProjection } from 'graphql-fields-list';
 
 import { User } from '../../models';
-import { signToken, extractReqFields } from '../../utils';
+import { signToken } from '../../utils';
 
 export const users = async (p: any, args: any, ctx: any, info: any) => {
-  const userList = await User.find(args).select(extractReqFields(info));
+  const userList = await User.find(args).select(fieldsProjection(info));
   return userList ? userList.map(user => user.toObject()) : [];
 };
 
 export const user = async (p: any, { id }: any, ctx: any, info: any) => {
-  const found = await User.findById(id).select(extractReqFields(info));
+  const found = await User.findById(id).select(fieldsProjection(info));
   return found ? found.toObject() : null;
+};
+
+export const userWinStats = async (p: any, args: any, ctx: any, info: any) => {
+  return User.getWinStats(p.id);
 };
 
 export const userFromParent = (userKey: string) => async (
@@ -19,7 +24,7 @@ export const userFromParent = (userKey: string) => async (
   ctx: any,
   info: any
 ) => {
-  const found = await User.findById(p[userKey]).select(extractReqFields(info));
+  const found = await User.findById(p[userKey]).select(fieldsProjection(info));
   return found ? found.toObject() : null;
 };
 
@@ -72,5 +77,8 @@ export default {
   Mutation: {
     register,
     editUser,
+  },
+  User: {
+    winStats: userWinStats,
   },
 };

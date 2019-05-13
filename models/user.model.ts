@@ -1,6 +1,8 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Model } from 'mongoose';
 import { hash, compare } from 'bcrypt';
 import { isEmail } from 'validator';
+
+import Game from './game.model';
 
 export interface IUser extends Document {
   id: string;
@@ -10,6 +12,10 @@ export interface IUser extends Document {
   avatar?: string;
   facebookId?: string;
   checkPassword(password: string): Promise<boolean>;
+}
+
+export interface IUserModel extends Model<IUser> {
+  getWinStats(id: string): Promise<number[]>;
 }
 
 const userSchema = new Schema(
@@ -53,6 +59,26 @@ userSchema.pre('save', async function() {
   }
 });
 
+userSchema.statics.getWinStats = async function(id: string): Promise<number[]> {
+  const games = await Game.find({ $or: [{ team1: id }, { team2: id }] }).select(
+    'team1 team2 score1 score2'
+  );
+
+  let gameCount = games.length;
+  let wins = 0;
+
+  games.forEach(({ team1, team2, score1, score2 }) => {
+    if (
+      (team1.includes(id) && score1 > score2) ||
+      (team2.includes(id) && score2 > score1)
+    ) {
+      wins += 1;
+    }
+  });
+
+  return [wins, gameCount];
+};
+
 // compare password with db hash
 userSchema.methods.checkPassword = async function(
   password: string
@@ -60,6 +86,6 @@ userSchema.methods.checkPassword = async function(
   return compare(password, this.get('password'));
 };
 
-const User = model<IUser>('User', userSchema);
+const User = model<IUser, IUserModel>('User', userSchema);
 
 export default User;

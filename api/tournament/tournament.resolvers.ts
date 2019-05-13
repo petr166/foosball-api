@@ -1,12 +1,12 @@
 import { ApolloError, AuthenticationError } from 'apollo-server';
+import { fieldsProjection } from 'graphql-fields-list';
 
 import { Tournament } from '../../models';
-import { extractReqFields } from '../../utils';
 import { userFromParent } from '../user/user.resolvers';
 
 export const tournament = async (p: any, { id }: any, ctx: any, info: any) => {
   const tournament = await Tournament.findById(id).select(
-    extractReqFields(info)
+    fieldsProjection(info)
   );
   return tournament ? tournament.toObject() : null;
 };
@@ -18,7 +18,7 @@ export const tournamentFromParent = (tournamentKey: string) => async (
   info: any
 ) => {
   const tournament = await Tournament.findById(p[tournamentKey]).select(
-    extractReqFields(info)
+    fieldsProjection(info)
   );
 
   return tournament ? tournament.toObject() : null;
