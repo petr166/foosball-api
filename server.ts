@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server';
+import { print } from 'graphql';
 import Promise from 'bluebird';
 
 import { PROD, PORT } from './config';
@@ -20,7 +21,7 @@ const server = new ApolloServer({
     // log errors in dev mode
     if (!PROD) {
       console.log('====================================');
-      console.log(err);
+      console.log('Error:', err);
       console.log('====================================');
     } else {
       if (err.extensions && err.extensions.exception) {
@@ -30,6 +31,19 @@ const server = new ApolloServer({
 
     return err;
   },
+  extensions: [
+    () => ({
+      requestDidStart: ({ queryString, parsedQuery, variables }) => {
+        const query = queryString || (parsedQuery ? print(parsedQuery) : null);
+        console.log(
+          `\n\n[${new Date().toLocaleTimeString()}] REQUEST ->>>>>\n`
+        );
+        console.log(query);
+        console.log('variables:', variables);
+        console.log('<<<<<<<<<<<<<<');
+      },
+    }),
+  ],
 });
 
 // connect to db
