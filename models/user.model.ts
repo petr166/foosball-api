@@ -101,19 +101,14 @@ userSchema.statics.getTrophyCount = async function(
 
 userSchema.statics.getGames = async function(
   id: string,
-  { limit = 5, offset = 0, select = {}, ...options }: PaginateOptions = {}
+  { limit = 5, offset = 0, ...options }: PaginateOptions = {}
 ): Promise<PaginateResult<IGame>> {
-  select = isString(select)
-    ? select + ' team1 team2'
-    : { ...select, team1: 1, team2: 1 };
-
   return Game.paginate(
     { $or: [{ team1: id }, { team2: id }] },
     {
       sort: '-time',
       limit,
       offset,
-      select,
       ...options,
     }
   );

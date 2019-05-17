@@ -40,7 +40,6 @@ export const standingSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true,
     },
     played: { type: Number, default: 0, min: 0 },
     won: {
@@ -65,7 +64,7 @@ standingSchema.set('toObject', { getters: true, virtuals: true });
 standingSchema.virtual('points').get(function(this: IStanding) {
   const fullPoints =
     this.rawPoints * FRADRAG_PERCENTAGE +
-    this.rawPoints * (1 - FRADRAG_PERCENTAGE) * (this.won / this.played);
+    this.rawPoints * (1 - FRADRAG_PERCENTAGE) * (this.won / this.played || 1);
   return +fullPoints.toFixed(1);
 });
 

@@ -1,16 +1,15 @@
 import { ApolloError, UserInputError } from 'apollo-server';
-import { fieldsProjection } from 'graphql-fields-list';
 
 import { User } from '../../models';
-import { signToken } from '../../utils';
+import { signToken, fieldsProjectionX } from '../../utils';
 
 export const users = async (p: any, args: any, ctx: any, info: any) => {
-  const userList = await User.find(args).select(fieldsProjection(info));
+  const userList = await User.find(args).select(fieldsProjectionX(info));
   return userList ? userList.map(user => user.toObject()) : [];
 };
 
 export const user = async (p: any, { id }: any, ctx: any, info: any) => {
-  const found = await User.findById(id).select(fieldsProjection(info));
+  const found = await User.findById(id).select(fieldsProjectionX(info));
   return found ? found.toObject() : null;
 };
 
@@ -22,7 +21,7 @@ export const userTrophyCount = async (p: any) => {
   return User.getTrophyCount(p.id);
 };
 
-export const userGames = async (
+export const userGamesConnection = async (
   p: any,
   { first, cursor }: any,
   ctx: any,
@@ -31,7 +30,7 @@ export const userGames = async (
   const { docs, total } = await User.getGames(p.id, {
     limit: first,
     offset: cursor,
-    select: fieldsProjection(info, {
+    select: fieldsProjectionX(info, {
       path: 'edges.node',
     }),
   });
@@ -55,7 +54,7 @@ export const userFromParent = (userKey: string) => async (
   ctx: any,
   info: any
 ) => {
-  const found = await User.findById(p[userKey]).select(fieldsProjection(info));
+  const found = await User.findById(p[userKey]).select(fieldsProjectionX(info));
   return found ? found.toObject() : null;
 };
 
@@ -112,6 +111,6 @@ export default {
   User: {
     winStats: userWinStats,
     trophyCount: userTrophyCount,
-    games: userGames,
+    games: userGamesConnection,
   },
 };

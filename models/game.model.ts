@@ -22,13 +22,11 @@ const gameSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Tournament',
       required: true,
-      select: true,
     },
     creatorUser: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      select: true,
     },
     time: {
       type: Date,
@@ -42,7 +40,7 @@ const gameSchema = new Schema(
           ref: 'User',
         },
       ],
-      select: true,
+
       required: true,
     },
     team2: {
@@ -52,7 +50,7 @@ const gameSchema = new Schema(
           ref: 'User',
         },
       ],
-      select: true,
+
       required: true,
     },
     score1: {

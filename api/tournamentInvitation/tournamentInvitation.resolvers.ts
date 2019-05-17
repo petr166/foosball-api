@@ -1,7 +1,6 @@
-import { fieldsProjection } from 'graphql-fields-list';
-
 import { TournamentInvitation } from '../../models';
 import { tournamentFromParent } from '../tournament/tournament.resolvers';
+import { fieldsProjectionX } from '../../utils';
 
 export const tournamentInvitations = async (
   p: any,
@@ -11,7 +10,7 @@ export const tournamentInvitations = async (
 ) => {
   const tournamentInvitations = await TournamentInvitation.find({
     user: currentUser.id,
-  }).select(fieldsProjection(info));
+  }).select(fieldsProjectionX(info));
   return tournamentInvitations.map(v => v.toObject());
 };
 

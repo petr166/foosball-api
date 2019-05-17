@@ -1,7 +1,6 @@
-import { fieldsProjection } from 'graphql-fields-list';
-
 import { Game, User } from '../../models';
 import { tournamentFromParent } from '../tournament/tournament.resolvers';
+import { fieldsProjectionX } from '../../utils';
 
 export const createGame = async (
   p: any,
@@ -19,7 +18,7 @@ export const gameTeam = (field: string) => async (
   info: any
 ) => {
   return p[field].map((id: string) =>
-    User.findById(id).select(fieldsProjection(info))
+    User.findById(id).select(fieldsProjectionX(info))
   );
 };
 
