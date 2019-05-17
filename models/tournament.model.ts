@@ -123,6 +123,9 @@ const tournamentSchema = new Schema(
       type: [standingSchema],
       default: [],
     },
+    winner: {
+      type: standingSchema,
+    },
   },
   { timestamps: true }
 );

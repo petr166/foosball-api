@@ -3,6 +3,7 @@ import { hash, compare } from 'bcrypt';
 import { isEmail } from 'validator';
 
 import Game from './game.model';
+import Tournament from './tournament.model';
 
 export interface IUser extends Document {
   id: string;
@@ -16,6 +17,7 @@ export interface IUser extends Document {
 
 export interface IUserModel extends Model<IUser> {
   getWinStats(id: string): Promise<number[]>;
+  getTrophyCount(id: string): Promise<number>;
 }
 
 const userSchema = new Schema(
@@ -77,6 +79,12 @@ userSchema.statics.getWinStats = async function(id: string): Promise<number[]> {
   });
 
   return [wins, gameCount];
+};
+
+userSchema.statics.getTrophyCount = async function(
+  id: string
+): Promise<number> {
+  return Tournament.countDocuments({ 'winner.user': id });
 };
 
 // compare password with db hash

@@ -14,8 +14,12 @@ export const user = async (p: any, { id }: any, ctx: any, info: any) => {
   return found ? found.toObject() : null;
 };
 
-export const userWinStats = async (p: any, args: any, ctx: any, info: any) => {
+export const userWinStats = async (p: any) => {
   return User.getWinStats(p.id);
+};
+
+export const userTrophyCount = async (p: any) => {
+  return User.getTrophyCount(p.id);
 };
 
 export const userFromParent = (userKey: string) => async (
@@ -80,5 +84,6 @@ export default {
   },
   User: {
     winStats: userWinStats,
+    trophyCount: userTrophyCount,
   },
 };

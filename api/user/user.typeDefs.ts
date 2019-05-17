@@ -17,6 +17,7 @@ export default gql`
     name: String!
     avatar: String
     winStats: [Int]!
+    trophyCount: Int!
     createdAt: String!
     updatedAt: String!
   }
