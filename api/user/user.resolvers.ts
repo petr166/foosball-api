@@ -22,6 +22,33 @@ export const userTrophyCount = async (p: any) => {
   return User.getTrophyCount(p.id);
 };
 
+export const userGames = async (
+  p: any,
+  { first, cursor }: any,
+  ctx: any,
+  info: any
+) => {
+  const { docs, total } = await User.getGames(p.id, {
+    limit: first,
+    offset: cursor,
+    select: fieldsProjection(info, {
+      path: 'edges.node',
+    }),
+  });
+
+  return {
+    totalCount: total,
+    pageInfo: {
+      hasNextPage: total > cursor + first,
+      endCursor: total,
+    },
+    edges: docs.map((doc, i) => ({
+      node: doc.toObject(),
+      cursor: cursor + i + 1,
+    })),
+  };
+};
+
 export const userFromParent = (userKey: string) => async (
   p: any,
   args: any,
@@ -85,5 +112,6 @@ export default {
   User: {
     winStats: userWinStats,
     trophyCount: userTrophyCount,
+    games: userGames,
   },
 };

@@ -31,6 +31,16 @@ const rootTypeDefs = gql`
     createdAt: String!
     updatedAt: String!
   }
+
+  interface Connection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+  }
+
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: Int!
+  }
 `;
 
 export default makeExecutableSchema({
@@ -43,7 +53,10 @@ export default makeExecutableSchema({
     gameTypeDefs,
   ],
   resolvers: merge([
-    { Doc: { __resolveType: () => null } },
+    {
+      Doc: { __resolveType: () => null },
+      Connection: { __resolveType: () => null },
+    },
     userResolvers,
     authResolvers,
     tournamentResolvers,

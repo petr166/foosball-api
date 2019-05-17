@@ -1,8 +1,8 @@
 import { Schema, model, Document } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate';
 
 import { IUser } from './user.model';
 import Tournament, { ITournament, IStanding } from './tournament.model';
-
 import { SCORE_DIFF_FACTOR, POINTS_DIFF_FACTOR, BASE_POINTS } from '../config';
 
 export interface IGame extends Document {
@@ -22,11 +22,13 @@ const gameSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Tournament',
       required: true,
+      select: true,
     },
     creatorUser: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      select: true,
     },
     time: {
       type: Date,
@@ -40,6 +42,7 @@ const gameSchema = new Schema(
           ref: 'User',
         },
       ],
+      select: true,
       required: true,
     },
     team2: {
@@ -49,6 +52,7 @@ const gameSchema = new Schema(
           ref: 'User',
         },
       ],
+      select: true,
       required: true,
     },
     score1: {
@@ -64,6 +68,8 @@ const gameSchema = new Schema(
   },
   { timestamps: true }
 );
+
+gameSchema.plugin(mongoosePaginate);
 
 gameSchema.set('toObject', { getters: true, virtuals: true });
 

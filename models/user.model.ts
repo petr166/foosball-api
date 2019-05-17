@@ -1,8 +1,16 @@
-import { Schema, model, Document, Model } from 'mongoose';
+import {
+  Schema,
+  model,
+  Document,
+  Model,
+  PaginateResult,
+  PaginateOptions,
+} from 'mongoose';
 import { hash, compare } from 'bcrypt';
 import { isEmail } from 'validator';
+import { isString } from 'lodash';
 
-import Game from './game.model';
+import Game, { IGame } from './game.model';
 import Tournament from './tournament.model';
 
 export interface IUser extends Document {
@@ -18,6 +26,10 @@ export interface IUser extends Document {
 export interface IUserModel extends Model<IUser> {
   getWinStats(id: string): Promise<number[]>;
   getTrophyCount(id: string): Promise<number>;
+  getGames(
+    id: string,
+    options?: PaginateOptions
+  ): Promise<PaginateResult<IGame>>;
 }
 
 const userSchema = new Schema(
@@ -85,6 +97,26 @@ userSchema.statics.getTrophyCount = async function(
   id: string
 ): Promise<number> {
   return Tournament.countDocuments({ 'winner.user': id });
+};
+
+userSchema.statics.getGames = async function(
+  id: string,
+  { limit = 5, offset = 0, select = {}, ...options }: PaginateOptions = {}
+): Promise<PaginateResult<IGame>> {
+  select = isString(select)
+    ? select + ' team1 team2'
+    : { ...select, team1: 1, team2: 1 };
+
+  return Game.paginate(
+    { $or: [{ team1: id }, { team2: id }] },
+    {
+      sort: '-time',
+      limit,
+      offset,
+      select,
+      ...options,
+    }
+  );
 };
 
 // compare password with db hash
