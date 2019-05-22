@@ -21,8 +21,13 @@ const connectDb = (): any => {
         try {
           await Promise.map(Object.keys(models), (modelKey: string) =>
             // @ts-ignore 7017
-            models[modelKey].syncIndexes()
+            models[modelKey]
+              .syncIndexes()
+              .catch((err: any) =>
+                err.code !== 26 ? Promise.reject(err) : true
+              )
           );
+
           console.log(`Rebuilt db indexes`);
         } catch (e) {
           // code 26 is collection not yet created

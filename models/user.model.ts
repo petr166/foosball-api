@@ -5,10 +5,11 @@ import {
   Model,
   PaginateResult,
   PaginateOptions,
+  PaginateModel,
 } from 'mongoose';
 import { hash, compare } from 'bcrypt';
 import { isEmail } from 'validator';
-import { isString } from 'lodash';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 import Game, { IGame } from './game.model';
 import Tournament from './tournament.model';
@@ -23,7 +24,7 @@ export interface IUser extends Document {
   checkPassword(password: string): Promise<boolean>;
 }
 
-export interface IUserModel extends Model<IUser> {
+export interface IUserModel extends Model<IUser>, PaginateModel<IUser> {
   getWinStats(id: string): Promise<number[]>;
   getTrophyCount(id: string): Promise<number>;
   getGames(
@@ -34,7 +35,7 @@ export interface IUserModel extends Model<IUser> {
 
 const userSchema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, index: true },
     email: {
       type: String,
       required: true,
@@ -56,6 +57,8 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
+userSchema.plugin(mongoosePaginate);
 
 userSchema.set('toObject', { getters: true, virtuals: true });
 

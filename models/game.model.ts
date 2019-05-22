@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 import { IUser } from './user.model';
 import Tournament, { ITournament, IStanding } from './tournament.model';
