@@ -2,7 +2,8 @@ import { gql } from 'apollo-server';
 
 export default gql`
   extend type Query {
-    users: [User] @isAuthenticated
+    users(term: String, first: Int!, cursor: Int!): UsersPaginated!
+      @isAuthenticated
     user(id: ID!): User @isAuthenticated
   }
 
@@ -48,5 +49,16 @@ export default gql`
   type UserGamesEdge {
     cursor: Int!
     node: Game
+  }
+
+  type UsersPaginated implements Connection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+    edges: [UserEdge]!
+  }
+
+  type UserEdge {
+    cursor: Int!
+    node: User
   }
 `;

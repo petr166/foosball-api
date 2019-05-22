@@ -3,9 +3,41 @@ import { ApolloError, UserInputError } from 'apollo-server';
 import { User } from '../../models';
 import { signToken, fieldsProjectionX } from '../../utils';
 
-export const users = async (p: any, args: any, ctx: any, info: any) => {
-  const userList = await User.find(args).select(fieldsProjectionX(info));
-  return userList ? userList.map(user => user.toObject()) : [];
+export const users = async (
+  p: any,
+  { term, first, cursor }: { term?: string; first: number; cursor: number },
+  ctx: any,
+  info: any
+) => {
+  let searchOptions = {};
+  if (!!term && term.length > 1) {
+    const regex = new RegExp(`\\b${term}`, 'i');
+    searchOptions = {
+      name: regex,
+    };
+  }
+
+  const { docs, totalDocs = 0 } = await User.paginate(searchOptions, {
+    limit: first,
+    offset: cursor,
+    select: fieldsProjectionX(info, {
+      path: 'edges.node',
+    }),
+    sort: { name: 'asc' },
+    collation: { locale: 'en' },
+  });
+
+  return {
+    totalCount: totalDocs,
+    pageInfo: {
+      hasNextPage: totalDocs > cursor + first,
+      endCursor: cursor + first,
+    },
+    edges: docs.map((doc, i) => ({
+      node: doc.toObject(),
+      cursor: cursor + i + 1,
+    })),
+  };
 };
 
 export const user = async (p: any, { id }: any, ctx: any, info: any) => {
@@ -39,7 +71,7 @@ export const userGamesConnection = async (
     totalCount: total,
     pageInfo: {
       hasNextPage: total > cursor + first,
-      endCursor: total,
+      endCursor: cursor + first,
     },
     edges: docs.map((doc, i) => ({
       node: doc.toObject(),
