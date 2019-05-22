@@ -22,7 +22,7 @@ export interface ITournament extends Document {
   endDate: Date;
   privacy: 'public' | 'private';
   teamSize: 1 | 2;
-  maxPlayers: 5 | 10 | 20 | 50;
+  maxPlayers: 10 | 20 | 50 | 100;
   minGames: number;
   creatorUser: string | IUser;
   standings: IStanding[];
@@ -105,7 +105,7 @@ const tournamentSchema = new Schema(
     },
     maxPlayers: {
       type: Number,
-      enum: [5, 10, 20, 50],
+      enum: [10, 20, 50, 100],
       default: 20,
     },
     minGames: {
