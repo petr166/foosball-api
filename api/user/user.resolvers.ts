@@ -27,11 +27,13 @@ export const users = async (
     collation: { locale: 'en' },
   });
 
+  const hasNextPage = totalDocs > cursor + first;
+
   return {
     totalCount: totalDocs,
     pageInfo: {
-      hasNextPage: totalDocs > cursor + first,
-      endCursor: cursor + first,
+      hasNextPage,
+      endCursor: hasNextPage ? cursor + first : totalDocs,
     },
     edges: docs.map((doc, i) => ({
       node: doc.toObject(),
@@ -59,7 +61,7 @@ export const userGamesConnection = async (
   ctx: any,
   info: any
 ) => {
-  const { docs, total } = await User.getGames(p.id, {
+  const { docs, totalDocs = 0 } = await User.getGames(p.id, {
     limit: first,
     offset: cursor,
     select: fieldsProjectionX(info, {
@@ -67,11 +69,13 @@ export const userGamesConnection = async (
     }),
   });
 
+  const hasNextPage = totalDocs > cursor + first;
+
   return {
-    totalCount: total,
+    totalCount: totalDocs,
     pageInfo: {
-      hasNextPage: total > cursor + first,
-      endCursor: cursor + first,
+      hasNextPage,
+      endCursor: hasNextPage ? cursor + first : totalDocs,
     },
     edges: docs.map((doc, i) => ({
       node: doc.toObject(),
