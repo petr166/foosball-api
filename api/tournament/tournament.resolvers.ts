@@ -1,6 +1,6 @@
 import { ApolloError, AuthenticationError } from 'apollo-server';
 
-import { Tournament } from '../../models';
+import { Tournament, TournamentInvitation } from '../../models';
 import { userFromParent } from '../user/user.resolvers';
 import { fieldsProjectionX } from '../../utils';
 
@@ -29,13 +29,30 @@ export const tournamentFromParent = (tournamentKey: string) => async (
 
 export const createTournament = async (
   p: any,
-  { input }: any,
+  { input: { inviteList, ...input } }: any,
   { currentUser }: any
 ) => {
   const tournament = await Tournament.create({
     ...input,
     creatorUser: currentUser.id,
   });
+
+  // create tournament invitations
+  if (!!inviteList && inviteList.length) {
+    await Promise.map(inviteList, async userId => {
+      const found = await TournamentInvitation.findOne({
+        tournament: tournament.id,
+        user: userId,
+      });
+
+      if (found) return found;
+
+      return TournamentInvitation.create({
+        tournament: tournament.id,
+        user: userId,
+      });
+    });
+  }
 
   return tournament ? tournament.toObject() : null;
 };
