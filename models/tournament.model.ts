@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 import { IUser } from './user.model';
 import TournamentInvitation from './tournamentInvitation.model';
@@ -128,6 +129,8 @@ const tournamentSchema = new Schema(
   },
   { timestamps: true }
 );
+
+tournamentSchema.plugin(mongoosePaginate);
 
 tournamentSchema.set('toObject', { getters: true, virtuals: true });
 

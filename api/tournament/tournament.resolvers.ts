@@ -27,6 +27,71 @@ export const tournamentFromParent = (tournamentKey: string) => async (
   return tournament ? tournament.toObject() : null;
 };
 
+export const tournaments = async (
+  p: any,
+  {
+    term,
+    first,
+    cursor,
+    category = 'mine',
+  }: {
+    term?: String;
+    category?: 'mine' | 'public' | 'private';
+    first: number;
+    cursor: number;
+  },
+  { currentUser }: any,
+  info: any
+) => {
+  let findQuery: any;
+  switch (category) {
+    case 'mine':
+    default:
+      findQuery = {
+        $or: [
+          { creatorUser: currentUser.id },
+          { 'standings.user': currentUser.id },
+        ],
+      };
+      break;
+    case 'public':
+      findQuery = {
+        $and: [
+          { creatorUser: { $ne: currentUser.id } },
+          { 'standings.user': { $ne: currentUser.id } },
+          { privacy: 'public' },
+        ],
+      };
+  }
+
+  if (!!term && term.length > 1) {
+    const regex = new RegExp(`\\b${term}`, 'i');
+    findQuery.name = regex;
+  }
+
+  const { docs, totalDocs = 0 } = await Tournament.paginate(findQuery, {
+    limit: first,
+    offset: cursor,
+    select: fieldsProjectionX(info, { path: 'edges.node' }),
+    sort: { startDate: 'asc' },
+    collation: { locale: 'en' },
+  });
+
+  const hasNextPage = totalDocs > cursor + first;
+
+  return {
+    totalCount: totalDocs,
+    pageInfo: {
+      hasNextPage,
+      endCursor: hasNextPage ? cursor + first : totalDocs,
+    },
+    edges: docs.map((doc, i) => ({
+      node: doc.toObject(),
+      cursor: cursor + i + 1,
+    })),
+  };
+};
+
 export const createTournament = async (
   p: any,
   { input: { inviteList, ...input } }: any,
@@ -93,6 +158,7 @@ export const joinTournament = async (
 export default {
   Query: {
     tournament,
+    tournaments,
   },
   Mutation: {
     createTournament,

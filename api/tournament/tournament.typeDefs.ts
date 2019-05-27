@@ -3,6 +3,12 @@ import { gql } from 'apollo-server';
 export default gql`
   extend type Query {
     tournament(id: ID!): Tournament @isAuthenticated
+    tournaments(
+      term: String
+      category: String
+      first: Int!
+      cursor: Int!
+    ): TournamentsPaginated! @isAuthenticated
   }
 
   extend type Mutation {
@@ -62,5 +68,16 @@ export default gql`
     points: Float!
     createdAt: String!
     updatedAt: String!
+  }
+
+  type TournamentsPaginated implements Connection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+    edges: [TournamentEdge]!
+  }
+
+  type TournamentEdge {
+    cursor: Int!
+    node: Tournament
   }
 `;
