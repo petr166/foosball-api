@@ -36,21 +36,27 @@ export const tournaments = async (
     category = 'mine',
   }: {
     term?: String;
-    category?: 'mine' | 'public' | 'private';
+    category?: 'mine' | 'public' | 'private' | 'old';
     first: number;
     cursor: number;
   },
   { currentUser }: any,
   info: any
 ) => {
+  const now = new Date();
   let findQuery: any;
   switch (category) {
     case 'mine':
     default:
       findQuery = {
-        $or: [
-          { creatorUser: currentUser.id },
-          { 'standings.user': currentUser.id },
+        $and: [
+          {
+            $or: [
+              { creatorUser: currentUser.id },
+              { 'standings.user': currentUser.id },
+            ],
+          },
+          { endDate: { $gte: now.getTime() - 2 * 86400000 } },
         ],
       };
       break;
@@ -60,8 +66,23 @@ export const tournaments = async (
           { creatorUser: { $ne: currentUser.id } },
           { 'standings.user': { $ne: currentUser.id } },
           { privacy: 'public' },
+          { endDate: { $gte: now.getTime() - 2 * 86400000 } },
         ],
       };
+      break;
+    case 'old':
+      findQuery = {
+        $and: [
+          {
+            $or: [
+              { creatorUser: currentUser.id },
+              { 'standings.user': currentUser.id },
+            ],
+          },
+          { endDate: { $lte: now.getTime() - 2 * 86400000 } },
+        ],
+      };
+      break;
   }
 
   if (!!term && term.length > 1) {
