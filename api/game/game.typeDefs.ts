@@ -30,4 +30,15 @@ export default gql`
     score1: Float!
     score2: Float!
   }
+
+  type GamesPaginated implements Connection {
+    totalCount: Int!
+    pageInfo: PageInfo!
+    edges: [GameEdge]!
+  }
+
+  type GameEdge {
+    cursor: Int!
+    node: Game
+  }
 `;

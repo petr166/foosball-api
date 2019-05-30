@@ -1,9 +1,18 @@
-import { Schema, model, Document } from 'mongoose';
+import {
+  Schema,
+  model,
+  Document,
+  Model,
+  PaginateModel,
+  PaginateOptions,
+  PaginateResult,
+} from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 import { IUser } from './user.model';
 import TournamentInvitation from './tournamentInvitation.model';
 import { FRADRAG_PERCENTAGE } from '../config';
+import Game, { IGame } from './game.model';
 
 export interface IStanding extends Document {
   id: string;
@@ -33,6 +42,15 @@ export interface ITournament extends Document {
   canJoin(userId: string | Schema.Types.ObjectId): Promise<boolean>;
   hasParticipants(userIds: any[]): boolean;
   editStandings(newStandings: IStanding[]): Promise<ITournament | null>;
+}
+
+export interface ITournamentModel
+  extends Model<ITournament>,
+    PaginateModel<ITournament> {
+  getGames(
+    id: string,
+    options?: PaginateOptions
+  ): Promise<PaginateResult<IGame>>;
 }
 
 export const standingSchema = new Schema(
@@ -144,6 +162,21 @@ tournamentSchema.pre('save', function() {
   }
 });
 
+tournamentSchema.statics.getGames = async function(
+  id: string,
+  { limit = 10, offset = 0, ...options }: PaginateOptions = {}
+): Promise<PaginateResult<IGame>> {
+  return Game.paginate(
+    { tournament: id },
+    {
+      sort: '-time',
+      limit,
+      offset,
+      ...options,
+    }
+  );
+};
+
 tournamentSchema.methods.joinTournament = async function(
   userId: string | Schema.Types.ObjectId
 ): Promise<ITournament | null> {
@@ -208,6 +241,9 @@ tournamentSchema.methods.editStandings = async function(
   return this.save();
 };
 
-const Tournament = model<ITournament>('Tournament', tournamentSchema);
+const Tournament = model<ITournament, ITournamentModel>(
+  'Tournament',
+  tournamentSchema
+);
 
 export default Tournament;

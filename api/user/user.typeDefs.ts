@@ -19,7 +19,7 @@ export default gql`
     avatar: String
     winStats: [Int]!
     trophyCount: Int!
-    games(first: Int!, cursor: Int!): UserGamesConnection!
+    games(first: Int!, cursor: Int!): GamesPaginated!
     createdAt: String!
     updatedAt: String!
   }
@@ -38,17 +38,6 @@ export default gql`
     repeatPassword: String
     avatar: String
     facebookId: String
-  }
-
-  type UserGamesConnection implements Connection {
-    totalCount: Int!
-    pageInfo: PageInfo!
-    edges: [UserGamesEdge]!
-  }
-
-  type UserGamesEdge {
-    cursor: Int!
-    node: Game
   }
 
   type UsersPaginated implements Connection {

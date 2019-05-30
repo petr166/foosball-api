@@ -176,6 +176,35 @@ export const joinTournament = async (
   return updated ? updated.toObject() : null;
 };
 
+export const tournamentGamesConnection = async (
+  p: any,
+  { first, cursor }: any,
+  ctx: any,
+  info: any
+) => {
+  const { docs, totalDocs = 0 } = await Tournament.getGames(p.id, {
+    limit: first,
+    offset: cursor,
+    select: fieldsProjectionX(info, {
+      path: 'edges.node',
+    }),
+  });
+
+  const hasNextPage = totalDocs > cursor + first;
+
+  return {
+    totalCount: totalDocs,
+    pageInfo: {
+      hasNextPage,
+      endCursor: hasNextPage ? cursor + first : totalDocs,
+    },
+    edges: docs.map((doc, i) => ({
+      node: doc.toObject(),
+      cursor: cursor + i + 1,
+    })),
+  };
+};
+
 export default {
   Query: {
     tournament,
@@ -188,6 +217,7 @@ export default {
   },
   Tournament: {
     creatorUser: userFromParent('creatorUser'),
+    games: tournamentGamesConnection,
   },
   Standing: {
     user: userFromParent('user'),
