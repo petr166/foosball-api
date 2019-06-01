@@ -33,6 +33,7 @@ export default gql`
     standings: [Standing]!
     createdAt: String!
     updatedAt: String!
+    canJoin: Boolean!
     games(first: Int!, cursor: Int!): GamesPaginated!
   }
 

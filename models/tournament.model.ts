@@ -183,10 +183,7 @@ tournamentSchema.methods.joinTournament = async function(
   if (!(await this.canJoin(userId)))
     throw new Error('This user cannot join the tournament.');
 
-  const standings: [IStanding] = this.get('standings');
-  if (standings.find(v => String(v.user) === String(userId)))
-    throw new Error('User already participating.');
-
+  const standings: IStanding[] = this.get('standings');
   this.set('standings', [...standings, { user: userId }]);
   const updated = await this.save();
 
@@ -201,6 +198,13 @@ tournamentSchema.methods.joinTournament = async function(
 tournamentSchema.methods.canJoin = async function(
   userId: string | Schema.Types.ObjectId
 ): Promise<boolean> {
+  if (
+    this.get('standings').find(
+      (v: IStanding) => String(v.user) === String(userId)
+    )
+  )
+    return false;
+
   return (
     this.get('privacy') === 'public' ||
     !!(await TournamentInvitation.findOne({

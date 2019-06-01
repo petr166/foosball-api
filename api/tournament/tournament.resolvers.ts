@@ -176,6 +176,16 @@ export const joinTournament = async (
   return updated ? updated.toObject() : null;
 };
 
+export const canJoinTournament = async (
+  { id }: any,
+  args: any,
+  { currentUser }: any
+) => {
+  const tournament = await Tournament.findById(id);
+  if (!tournament) throw new ApolloError('Not found', 'NOT_FOUND');
+  return tournament.canJoin(currentUser.id);
+};
+
 export const tournamentGamesConnection = async (
   p: any,
   { first, cursor }: any,
@@ -218,6 +228,7 @@ export default {
   Tournament: {
     creatorUser: userFromParent('creatorUser'),
     games: tournamentGamesConnection,
+    canJoin: canJoinTournament,
   },
   Standing: {
     user: userFromParent('user'),
