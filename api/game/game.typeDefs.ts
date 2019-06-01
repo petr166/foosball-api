@@ -1,9 +1,9 @@
 import { gql } from 'apollo-server';
 
 export default gql`
-  # extend type Query {
-  #   tournamentInvitations: [TournamentInvitation]! @isAuthenticated
-  # }
+  extend type Query {
+    feedGames(first: Int!, cursor: Int!): GamesPaginated! @isAuthenticated
+  }
 
   extend type Mutation {
     createGame(input: GameInput!): Game @isAuthenticated

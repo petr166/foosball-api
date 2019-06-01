@@ -36,6 +36,7 @@ export interface ITournament extends Document {
   minGames: number;
   creatorUser: string | IUser;
   standings: IStanding[];
+  winner?: IStanding;
   joinTournament(
     userId: string | Schema.Types.ObjectId
   ): Promise<ITournament | null>;
