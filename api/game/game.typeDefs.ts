@@ -16,8 +16,8 @@ export default gql`
     time: String!
     team1: [User]!
     team2: [User]!
-    score1: Float!
-    score2: Float!
+    score1: Int!
+    score2: Int!
     createdAt: String!
     updatedAt: String!
   }
@@ -27,8 +27,8 @@ export default gql`
     time: String!
     team1: [ID]!
     team2: [ID]!
-    score1: Float!
-    score2: Float!
+    score1: Int!
+    score2: Int!
   }
 
   type GamesPaginated implements Connection {
