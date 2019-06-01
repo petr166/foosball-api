@@ -23,11 +23,11 @@ export const tournamentInvitations = async (
       offset: cursor,
       select: fieldsProjectionX(info, {
         path: 'edges.node',
+        resolvableFields: ['tournament'],
       }),
       sort: '-createdAt',
     }
   );
-
   const hasNextPage = totalDocs > cursor + first;
 
   return {
