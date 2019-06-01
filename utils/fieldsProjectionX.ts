@@ -15,7 +15,12 @@ export const fieldsProjectionX = (
   }: FieldProjectionOptions = {}
 ) => {
   const options = { transform: { id: '_id' } };
-  const enhancedSkip = [...skip, ...resolvableFields.map(v => v + '.*')];
+  const enhancedSkip = [
+    ...skip,
+    ...resolvableFields.map(
+      v => (extraOptions.path ? extraOptions.path + '.' : '') + v + '.*'
+    ),
+  ];
   merge(options, extraOptions, { skip: enhancedSkip });
 
   const projection = fieldsProjection(info, options);
