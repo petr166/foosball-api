@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, PaginateModel, Model } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 import { IUser } from './user.model';
@@ -14,6 +14,10 @@ export interface IGame extends Document {
   team2: [string | IUser];
   score1: number;
   score2: number;
+}
+
+export interface IGameModel extends Model<IGame>, PaginateModel<IGame> {
+  cleanGames(): Promise<any>;
 }
 
 const gameSchema = new Schema(
@@ -132,6 +136,17 @@ gameSchema.pre('save', async function(this: IGame) {
   }
 });
 
-const Game = model<IGame>('Game', gameSchema);
+gameSchema.statics.cleanGames = async function(this: IGame): Promise<any> {
+  const gameList = await Game.find({})
+    .populate({ path: 'tournament', select: 'id' })
+    .select('id tournament');
+
+  return Promise.map(gameList, async game => {
+    if (game.tournament) return true;
+    return game.remove();
+  });
+};
+
+const Game = model<IGame, IGameModel>('Game', gameSchema);
 
 export default Game;

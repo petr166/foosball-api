@@ -164,6 +164,16 @@ tournamentSchema.pre('save', function(this: ITournament) {
   }
 });
 
+tournamentSchema.pre('remove', function(this: ITournament) {
+  TournamentInvitation.deleteMany({
+    tournament: this.get('id'),
+  }).exec();
+
+  Game.deleteMany({
+    tournament: this.get('id'),
+  }).exec();
+});
+
 tournamentSchema.statics.getGames = async function(
   id: string,
   { limit = 10, offset = 0, ...options }: PaginateOptions = {}
