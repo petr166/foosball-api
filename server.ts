@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import { PROD, PORT } from './config';
 import schema from './api/schema';
 import connectDb from './db';
+import { endTournamentsCron } from './utils';
 
 // set default Promise to bluebird
 global.Promise = Promise;
@@ -50,6 +51,7 @@ const server = new ApolloServer({
 connectDb().then(() => {
   // start server
   server.listen(PORT).then(({ url }: any) => {
+    endTournamentsCron();
     console.log(`🚀 Server ready at ${url}`);
   });
 });

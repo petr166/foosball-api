@@ -52,6 +52,7 @@ export interface ITournamentModel
     id: string,
     options?: PaginateOptions
   ): Promise<PaginateResult<IGame>>;
+  endTournaments(): Promise<any>;
 }
 
 export const standingSchema = new Schema(
@@ -153,7 +154,7 @@ tournamentSchema.plugin(mongoosePaginate);
 
 tournamentSchema.set('toObject', { getters: true, virtuals: true });
 
-tournamentSchema.pre('save', function() {
+tournamentSchema.pre('save', function(this: ITournament) {
   if (this.isNew) {
     this.set('standings', [
       {
@@ -176,6 +177,33 @@ tournamentSchema.statics.getGames = async function(
       ...options,
     }
   );
+};
+
+tournamentSchema.statics.endTournaments = async function(
+  this: ITournament
+): Promise<any> {
+  const now = new Date();
+  const tournamentList = await Tournament.find({
+    endDate: { $lt: now.getTime() },
+    winner: null,
+  });
+
+  return Promise.map(tournamentList, async tournament => {
+    const winner = tournament.standings.sort((a, b) => {
+      if (a.points === b.points) return 0;
+      return a.points > b.points ? -1 : 1;
+    })[0];
+
+    if (winner && winner.played >= tournament.minGames) {
+      tournament.winner = winner;
+      return tournament.save();
+    } else if (now.getTime() - tournament.endDate.getTime() > 5 * 86400000) {
+      // remove the tournament if not enough games & endded for more than 5 days
+      return tournament.remove();
+    } else {
+      return true;
+    }
+  });
 };
 
 tournamentSchema.methods.joinTournament = async function(
