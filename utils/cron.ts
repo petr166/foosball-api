@@ -1,5 +1,5 @@
 import { CronJob } from 'cron';
-import { Tournament, Game } from '../models';
+import { Tournament, Game, TournamentInvitation } from '../models';
 
 const endTournamentsExec = async () => {
   try {
@@ -37,9 +37,28 @@ export const cleanGamesCron = () => {
   return job;
 };
 
+const cleanTournamentInvitationsExec = async () => {
+  try {
+    await TournamentInvitation.cleanTournamentInvitations();
+  } catch (e) {
+    console.log('There was an error cleaning invitations', e);
+  }
+};
+
+export const cleanTournamentInvitationsCron = () => {
+  cleanTournamentInvitationsExec();
+  const job = new CronJob('* */10 * * * *', async () => {
+    cleanTournamentInvitationsExec();
+  });
+
+  job.start();
+  return job;
+};
+
 export const appCrons = () => {
   return {
     endTournamentsCron: endTournamentsCron(),
     cleanGamesCron: cleanGamesCron(),
+    cleanTournamentInvitationsCron: cleanTournamentInvitationsCron(),
   };
 };

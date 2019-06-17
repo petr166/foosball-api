@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Model, PaginateModel } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 import { IUser } from './user.model';
@@ -8,6 +8,12 @@ export interface ITournamentInvitation extends Document {
   id: string;
   tournament: string | ITournament;
   user: string | IUser;
+}
+
+export interface ITournamentInvitationModel
+  extends Model<ITournamentInvitation>,
+    PaginateModel<ITournamentInvitation> {
+  cleanTournamentInvitations(): Promise<any>;
 }
 
 const tournamentInvitationSchema = new Schema(
@@ -30,9 +36,22 @@ tournamentInvitationSchema.plugin(mongoosePaginate);
 
 tournamentInvitationSchema.set('toObject', { getters: true, virtuals: true });
 
-const TournamentInvitation = model<ITournamentInvitation>(
-  'TournamentInvitation',
-  tournamentInvitationSchema
-);
+tournamentInvitationSchema.statics.cleanTournamentInvitations = async function(
+  this: ITournamentInvitation
+): Promise<any> {
+  const invitationList = await TournamentInvitation.find({})
+    .populate({ path: 'tournament', select: 'id' })
+    .select('id tournament');
+
+  return Promise.map(invitationList, async invitation => {
+    if (invitation.tournament) return true;
+    return invitation.remove();
+  });
+};
+
+const TournamentInvitation = model<
+  ITournamentInvitation,
+  ITournamentInvitationModel
+>('TournamentInvitation', tournamentInvitationSchema);
 
 export default TournamentInvitation;
