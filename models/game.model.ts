@@ -112,11 +112,14 @@ gameSchema.pre('save', async function(this: IGame) {
     const pointDiff =
       losers.reduce(pointSumReducer, 0) / losers.length -
       winners.reduce(pointSumReducer, 0) / winners.length;
+
     const scoreDiff = Math.abs(this.score1 - this.score2);
+
     const pointsToAddRaw =
       BASE_POINTS +
       scoreDiff * SCORE_DIFF_FACTOR +
       (pointDiff > 0 ? pointDiff : 0) * POINTS_DIFF_FACTOR;
+
     const pointsToAdd = +pointsToAddRaw.toFixed(1);
 
     winners = winners.map((winnerStanding: IStanding) => {
