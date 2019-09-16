@@ -71,7 +71,7 @@ export const standingSchema = new Schema(
         validator: function(this: IStanding, val: number) {
           return val <= this.played;
         },
-        message: 'Invalid won count.',
+        msg: 'Invalid won count.',
       },
     },
     // is Float in gql
@@ -101,7 +101,7 @@ const tournamentSchema = new Schema(
         validator: function(this: ITournament, val: Date) {
           return this.isNew ? val > new Date() : true;
         },
-        message: () => 'Invalid startDate.',
+        msg: 'Invalid startDate.',
       },
     },
     endDate: {
@@ -111,7 +111,7 @@ const tournamentSchema = new Schema(
         validator: function(this: ITournament, val: Date) {
           return val > this.startDate;
         },
-        message: () => 'Invalid endDate.',
+        msg: 'Invalid endDate.',
       },
     },
     privacy: {

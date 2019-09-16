@@ -43,7 +43,7 @@ const userSchema = new Schema(
       unique: true,
       validate: {
         validator: (val: string) => isEmail(val),
-        message: () => 'Invalid email.',
+        msg: 'Invalid email.',
       },
     },
     password: {
