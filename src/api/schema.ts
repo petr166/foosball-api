@@ -41,6 +41,10 @@ const rootTypeDefs = gql`
     hasNextPage: Boolean!
     endCursor: Int!
   }
+
+  type ActionResponse {
+    done: Boolean!
+  }
 `;
 
 export default makeExecutableSchema({

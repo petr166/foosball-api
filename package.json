@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "tsc && node -r dotenv/config ./dist/server",
-    "dev": "ts-node-dev -r dotenv/config server",
+    "dev": "ts-node-dev -r dotenv/config ./src/server",
+    "build": "tsc",
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
