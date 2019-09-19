@@ -2,8 +2,10 @@ import { CronJob } from 'cron';
 import { Tournament, Game, TournamentInvitation } from '../models';
 
 const endTournamentsExec = async () => {
+  console.log('endTournaments job running...');
   try {
     await Tournament.endTournaments();
+    console.log('endTournaments job done!');
   } catch (e) {
     console.log('There was an error ending tournaments', e);
   }
@@ -11,7 +13,7 @@ const endTournamentsExec = async () => {
 
 export const endTournamentsCron = () => {
   endTournamentsExec();
-  const job = new CronJob('* */10 * * * *', async () => {
+  const job = new CronJob('*/1 * * * *', async () => {
     endTournamentsExec();
   });
 
@@ -20,8 +22,10 @@ export const endTournamentsCron = () => {
 };
 
 const cleanGamesExec = async () => {
+  console.log('cleanGames job running...');
   try {
     await Game.cleanGames();
+    console.log('cleanGames job done!');
   } catch (e) {
     console.log('There was an error cleaning games', e);
   }
@@ -29,7 +33,7 @@ const cleanGamesExec = async () => {
 
 export const cleanGamesCron = () => {
   cleanGamesExec();
-  const job = new CronJob('* */10 * * * *', async () => {
+  const job = new CronJob('*/10 * * * *', async () => {
     cleanGamesExec();
   });
 
@@ -38,8 +42,10 @@ export const cleanGamesCron = () => {
 };
 
 const cleanTournamentInvitationsExec = async () => {
+  console.log('cleanTournamentInvitations job running...');
   try {
     await TournamentInvitation.cleanTournamentInvitations();
+    console.log('cleanTournamentInvitations job done!');
   } catch (e) {
     console.log('There was an error cleaning invitations', e);
   }
@@ -47,7 +53,7 @@ const cleanTournamentInvitationsExec = async () => {
 
 export const cleanTournamentInvitationsCron = () => {
   cleanTournamentInvitationsExec();
-  const job = new CronJob('* */10 * * * *', async () => {
+  const job = new CronJob('*/10 * * * *', async () => {
     cleanTournamentInvitationsExec();
   });
 
