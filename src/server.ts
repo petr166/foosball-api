@@ -51,7 +51,7 @@ const server = new ApolloServer({
 connectDb().then(() => {
   // start server
   server.listen(PORT).then(({ url }: any) => {
-    console.log(`🚀 Server ready at ${url}`);
+    console.log(`🚀 Server ready at ${url}\n`);
     appCrons();
   });
 });
