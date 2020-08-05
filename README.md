@@ -30,5 +30,7 @@
   - [Bcrypt](https://github.com/kelektiv/node.bcrypt.js) - for hashing user passwords to be stored in the database
 
 - [GraphQL](https://graphql.org) - api query language, for efficient app-server data exchange
+
   - [Apollo Server](https://github.com/apollographql/apollo-server) - full graphQL server implementation, to handle queries, mutations, resolvers etc.
+
   - [JSON Web Token](https://github.com/auth0/node-jsonwebtoken) - generate [JWTs](https://jwt.io) for secure authentication
