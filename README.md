@@ -1,7 +1,7 @@
-# foosball-api - GraphQL API for [Foosball App](https://github.com/petr166/foosball-app)
+# foosball-api - GraphQL API for [Foosball App](https://github.com/petr166/foosball-app#readme)
 
 > NodeJS backend serving data from MongoDB through a GraphQL layer, k!boom  
-> ^for feature set and more check the [app repo](https://github.com/petr166/foosball-app)
+> ^for feature set and more check the [app repo](https://github.com/petr166/foosball-app#readme)
 
 ## Prerequisites
 
