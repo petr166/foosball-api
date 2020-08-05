@@ -28,7 +28,7 @@
     "@types/mongoose-paginate": "^5.0.6",
     "@types/mongoose-paginate-v2": "^1.0.2",
     "@types/validator": "^10.11.0",
-    "apollo-server": "^2.4.8",
+    "apollo-server": "^2.14.2",
     "bcrypt": "^3.0.6",
     "bluebird": "^3.5.4",
     "cron": "^1.7.1",
